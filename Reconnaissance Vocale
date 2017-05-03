@@ -1,0 +1,90 @@
+//Aliyya Adira
+//Polytech 2016/2017
+
+#include <techlib.h>
+#include "demo_io.h"
+
+
+
+#include "C:\Users\Archi D1\Documents\MONPROJET\audio\MONPROJET.h"
+#include "C:\Users\Archi D1\Documents\MONPROJET\recog\trig.h" //trigger word definition
+#include "C:\Users\Archi D1\Documents\MONPROJET\recog\comm.h" //command set definitions
+
+#define DEMO_TIMOUT COUNT_SEC(2*60) // 2 minutes timeout
+
+PARAMETERPASS results;
+
+void main (void)
+
+{
+	uchar error;
+	uchar class;
+	
+	_SysBeep (500);
+	
+	while (1)
+	{	
+		_GreenOn();
+		_RedOff();
+		
+		_SetOutput(GPIO_SPAN(1, 16), 0x0000);
+		
+		error = _T2SI((long)&nn_sample, (long)&gsearch_trig, T2SI_DEFAULT_KNOB, T2SI_DEFAULT_TIMEOUT, T2SI_DEFAULT_TRAILING, &results);
+		
+		if (error == ERR_OK) {
+			
+			_YellowOn();
+			_YellowOff();
+			
+			error = _T2SI((long)&nn_sample, (long)&gsearch_comm, T2SI_DEFAULT_KNOB, T2SI_DEFAULT_TIMEOUT, T2SI_DEFAULT_TRAILING, &results);
+			class = results.pp_b;
+			
+			if((class == G_comm_sample_nota ) || (error == ERR_RECOG_LOW_CONF))
+			
+			{
+				_RedOn();
+				_SysBeep (500);
+				_RedOff();
+			}
+			else if ((error == ERR_OK) || (error == ERR_RECOG_MID_CONF))
+			{
+					
+				if(class == G_comm_sample_AVANCE)
+				{
+				_YellowOn();
+				_PlaySnd(SND_Avance, (long)&SNDTBL_MONPROJET, 256);  
+				_YellowOff();
+				}
+					
+				if (class == G_comm_sample_RECULE)
+				{
+				_YellowOn();
+				_PlaySnd(SND_Recule, (long)&SNDTBL_MONPROJET, 256);  
+				_YellowOff();
+				}
+					
+				if (class == G_comm_sample_GAUCHE) 
+				{
+				_YellowOn();
+				_PlaySnd(SND_Gauche, (long)&SNDTBL_MONPROJET, 256);  
+				_YellowOff();
+				}
+						
+				if (class == G_comm_sample_DROITE ) 
+				{
+				_YellowOn();
+				_PlaySnd(SND_Droite, (long)&SNDTBL_MONPROJET, 256);  
+				_YellowOff();
+				}
+					
+				if (class == G_comm_sample_STOP) 
+				{
+				_YellowOn();
+				_PlaySnd(SND_Stop, (long)&SNDTBL_MONPROJET, 256);  
+				_YellowOff();
+				}
+			}	
+		}
+		
+	}
+}
